@@ -3,6 +3,7 @@ databases:
     databaseName: newsletter_agent
     user: newsletter_agent
     plan: free
+    ipAllowList: []
 
 services:
   - type: redis
