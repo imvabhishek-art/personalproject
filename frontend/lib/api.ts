@@ -1,3 +1,4 @@
+// production build: railway backend fallback active
 import axios, { AxiosError } from "axios";
 
 const RAILWAY_API = "https://perpetual-wisdom-production-fc62.up.railway.app/api/v1";
@@ -46,3 +47,4 @@ api.interceptors.response.use(
 );
 
 export default api;
+
