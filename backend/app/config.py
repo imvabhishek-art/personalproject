@@ -34,7 +34,7 @@ class Settings(BaseSettings):
     refresh_token_expire_days: int = 30
 
     # Anthropic
-    anthropic_api_key: str
+    anthropic_api_key: str = ""
 
     # Stripe
     stripe_secret_key: str = ""
