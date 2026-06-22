@@ -15,6 +15,16 @@ class Settings(BaseSettings):
     database_url: str
     database_pool_size: int = 20
 
+    @property
+    def async_database_url(self) -> str:
+        # Render provides postgres://, asyncpg needs postgresql+asyncpg://
+        url = self.database_url
+        if url.startswith("postgres://"):
+            url = url.replace("postgres://", "postgresql+asyncpg://", 1)
+        elif url.startswith("postgresql://") and "+asyncpg" not in url:
+            url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+        return url
+
     # Redis
     redis_url: str = "redis://localhost:6379/0"
 

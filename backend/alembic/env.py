@@ -19,8 +19,13 @@ if config.config_file_name is not None:
 
 target_metadata = Base.metadata
 
-database_url = os.environ.get("DATABASE_URL")
+database_url = os.environ.get("DATABASE_URL", "")
 if database_url:
+    # Normalize to asyncpg driver for alembic async runner
+    if database_url.startswith("postgres://"):
+        database_url = database_url.replace("postgres://", "postgresql+asyncpg://", 1)
+    elif database_url.startswith("postgresql://") and "+asyncpg" not in database_url:
+        database_url = database_url.replace("postgresql://", "postgresql+asyncpg://", 1)
     config.set_main_option("sqlalchemy.url", database_url)
 
 

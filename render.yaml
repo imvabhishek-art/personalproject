@@ -1,0 +1,101 @@
+databases:
+  - name: newsletter-agent-db
+    databaseName: newsletter_agent
+    user: newsletter_agent
+    plan: free
+
+services:
+  - type: redis
+    name: newsletter-agent-redis
+    plan: free
+    maxmemoryPolicy: noeviction
+
+  - type: web
+    name: newsletter-agent-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install . && alembic upgrade head
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: newsletter-agent-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          name: newsletter-agent-redis
+          type: redis
+          property: connectionString
+      - key: APP_ENV
+        value: production
+      - key: SECRET_KEY
+        value: f26720624fb218c6ce8caa3fa200123089acb2b5bd4530cb3840d2da8fa219cd
+      - key: ALLOWED_ORIGINS
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: STRIPE_PRICE_ID_100
+        sync: false
+      - key: STRIPE_PRICE_ID_500
+        sync: false
+      - key: STRIPE_PRICE_ID_2000
+        sync: false
+      - key: SENDGRID_API_KEY
+        sync: false
+      - key: SENDGRID_FROM_EMAIL
+        sync: false
+
+  - type: worker
+    name: newsletter-agent-worker
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install .
+    startCommand: python -m arq app.tasks.worker.WorkerSettings
+    plan: free
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: newsletter-agent-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          name: newsletter-agent-redis
+          type: redis
+          property: connectionString
+      - key: APP_ENV
+        value: production
+      - key: SECRET_KEY
+        value: f26720624fb218c6ce8caa3fa200123089acb2b5bd4530cb3840d2da8fa219cd
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: SENDGRID_API_KEY
+        sync: false
+      - key: SENDGRID_FROM_EMAIL
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+
+  - type: web
+    name: newsletter-agent-frontend
+    runtime: node
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    startCommand: node .next/standalone/server.js
+    plan: free
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        sync: false
+      - key: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+        sync: false
+      - key: NEXTAUTH_SECRET
+        value: f26720624fb218c6ce8caa3fa200123089acb2b5bd4530cb3840d2da8fa219cd
+      - key: NEXTAUTH_URL
+        sync: false
+      - key: NODE_ENV
+        value: production
