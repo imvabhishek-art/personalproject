@@ -10,6 +10,7 @@ services:
     name: newsletter-agent-redis
     plan: free
     maxmemoryPolicy: noeviction
+    ipAllowList: []
 
   - type: web
     name: newsletter-agent-backend
@@ -19,6 +20,7 @@ services:
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     plan: free
     healthCheckPath: /health
+    ipAllowList: []
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -89,6 +91,7 @@ services:
     buildCommand: npm ci && npm run build
     startCommand: node .next/standalone/server.js
     plan: free
+    ipAllowList: []
     envVars:
       - key: NEXT_PUBLIC_API_URL
         sync: false
