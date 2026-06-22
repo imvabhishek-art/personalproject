@@ -17,6 +17,14 @@ from app.config import get_settings
 router = APIRouter(prefix="/workspaces", tags=["generate"])
 
 
+def _check_anthropic_key():
+    if not get_settings().anthropic_api_key:
+        raise HTTPException(
+            status_code=503,
+            detail="AI generation is not configured yet. Add ANTHROPIC_API_KEY to enable content generation.",
+        )
+
+
 def get_redis():
     settings = get_settings()
     return aioredis.from_url(settings.redis_url, decode_responses=True)
@@ -28,6 +36,7 @@ async def enqueue_generation(
     workspace: Annotated[Workspace, Depends(get_workspace)],
     member: Annotated[WorkspaceMember, Depends(require_role(MemberRole.owner, MemberRole.editor))],
     db: Annotated[AsyncSession, Depends(get_db)],
+    _settings: Annotated[None, Depends(lambda: _check_anthropic_key())],
 ):
     cost = CREDIT_COSTS.get(body.type, 10)
     await check_balance(workspace.id, cost, db)
