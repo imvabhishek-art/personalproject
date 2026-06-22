@@ -1,6 +1,7 @@
 """Agent prompt builder unit tests."""
 
-from app.agent.prompts import build_system_prompt, build_generation_prompt, CREDIT_COSTS
+from app.agent.prompts import build_system_prompt, build_generation_prompt
+from app.agent.orchestrator import CREDIT_COSTS
 from app.db.models.generated_content import ContentType
 
 
