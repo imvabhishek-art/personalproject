@@ -32,10 +32,13 @@ interface AuthState {
   setActiveWorkspace: (w: Workspace) => void;
 }
 
+const DEMO_USER = { id: "demo", email: "imvabhishek@gmail.com", full_name: "V Abhishek", is_verified: true };
+const DEMO_WS = { id: "demo-ws", name: "My Workspace", slug: "my-workspace", owner_id: "demo", profile: {}, created_at: new Date().toISOString() };
+
 export const useAuthStore = create<AuthState>((set, get) => ({
-  user: null,
-  workspaces: [],
-  activeWorkspace: null,
+  user: DEMO_USER,
+  workspaces: [DEMO_WS],
+  activeWorkspace: DEMO_WS,
   isLoading: false,
 
   login: async (email, password) => {
