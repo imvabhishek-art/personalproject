@@ -28,7 +28,8 @@ async def register(body: RegisterRequest, db: AsyncSession = Depends(get_db)):
         is_verified=True,
     )
     db.add(user)
-    await db.flush()
+    await db.commit()
+    await db.refresh(user)
 
     return TokenResponse(
         access_token=create_access_token(str(user.id)),
