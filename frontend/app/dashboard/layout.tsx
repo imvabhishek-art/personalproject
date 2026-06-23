@@ -34,27 +34,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [wsOpen, setWsOpen] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("access_token");
-    if (!token) {
-      router.push("/auth/login");
-      return;
-    }
-    if (!user) {
-      fetchMe().catch(() => {
-        logout();
-        router.push("/auth/login");
-      });
-    }
-    if (workspaces.length === 0) {
-      fetchWorkspaces();
-    }
+    // Demo mode: auth bypassed
   }, []);
-
-  useEffect(() => {
-    if (user && workspaces.length === 0 && !localStorage.getItem("onboarding_skip")) {
-      router.push("/onboarding");
-    }
-  }, [user, workspaces]);
 
   const handleLogout = () => {
     logout();
